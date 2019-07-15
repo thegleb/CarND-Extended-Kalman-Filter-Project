@@ -20,5 +20,6 @@ xcuserdata/
 *.moved-aside
 *.xccheckout
 *.xcscmblueprint
+CarND-Extended-Kalman-Filter-Project.xcodeproj
 ide_profiles/xcode/Debug/
 ide_profiles/xcode/ExtendedKF.build/
