@@ -5,7 +5,6 @@ using Eigen::VectorXd;
 
 MatrixXd I = MatrixXd::Identity(2, 2);
 VectorXd u = VectorXd(2);
-Tools tools = Tools();
 
 /* 
  * Please note that the Eigen library does not initialize 
@@ -24,6 +23,8 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
   H_ = H_in;
   R_ = R_in;
   Q_ = Q_in;
+  
+  tools = Tools();
 }
 
 void KalmanFilter::Predict() {
@@ -52,12 +53,15 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
    * TODO: update the state by using Extended Kalman Filter equations
    */
   MatrixXd Hj = tools.CalculateJacobian(x_);
+
   VectorXd h_x = VectorXd(3);
+
   float px = x_[0];
   float py = x_[1];
   float vx = x_[2];
   float vy = x_[3];
   float px_2_py_2 = pow(px, 2) + pow(py, 2);
+
   h_x <<
     sqrt(px_2_py_2),
     atan(py / px),
