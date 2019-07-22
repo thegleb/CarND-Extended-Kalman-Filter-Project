@@ -43,20 +43,50 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
   float py = x_state(1);
   float vx = x_state(2);
   float vy = x_state(3);
-  
+
+  float px_2 = pow(px, 2);
+  float py_2 = pow(py, 2);
+  float sum = px_2 + py_2;
+  float sq_rt = sqrt(sum);
+  float mul = sum * sq_rt;
   // check division by zero
-  if (px*px + py*py < 0.001) {
+
+  if (sum < 0.001) {
     std::cout << "CalculateJacobian () - Error - Division by Zero" << std::endl;
     return Hj;
   }
 
-  float px_2 = pow(px, 2);
-  float py_2 = pow(py, 2);
-  float px_2_py_2 = px_2 + py_2;
   // compute the Jacobian matrix
-  Hj << px / sqrt(px_2_py_2), py / sqrt(px_2_py_2), 0, 0,
-    -py / (px_2_py_2), px / (px_2_py_2), 0, 0,
-    py * (vx * py - vy * px) / pow(px_2_py_2, 3 / 2),  px * (vy * px - vx * py) / pow(px_2_py_2, 3 / 2), px / sqrt(px_2_py_2), py / sqrt(px_2_py_2);
+  Hj << px/sq_rt, py/sq_rt, 0, 0,
+    -py/sum, px/sum, 0, 0,
+    py*(py*vx - px*vy)/mul,  px*(px*vy - py*vx)/mul, px/sq_rt, py/sq_rt;
 
   return Hj;
+}
+
+VectorXd Tools::CalculatePolar(const VectorXd &x) {
+  VectorXd polar = VectorXd(3);
+  
+  float px = x[0];
+  float py = x[1];
+  float vx = x[2];
+  float vy = x[3];
+  float px_2_py_2 = pow(px, 2) + pow(py, 2);
+  
+  float range = sqrt(px_2_py_2);
+  float rho = atan2(py, px);
+  float rho_dot = (px * vx + py * vy) / sqrt(px_2_py_2);
+
+  //  if (rho < -pi) {
+  //    rho += pi;
+  //  } else if (rho > pi) {
+  //    rho -= pi;
+  //  }
+  //
+
+  polar <<
+    range,
+    rho,
+    rho_dot;
+  return polar;
 }
