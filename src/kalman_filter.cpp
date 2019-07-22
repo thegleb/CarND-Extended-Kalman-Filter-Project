@@ -4,8 +4,6 @@
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
-#define PI 3.14159265358979
-
 /* 
  * Please note that the Eigen library does not initialize 
  *   VectorXd or MatrixXd objects with zeros upon creation.
@@ -15,18 +13,6 @@ KalmanFilter::KalmanFilter() {}
 
 KalmanFilter::~KalmanFilter() {}
 
-void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
-                        MatrixXd &H_in, MatrixXd &R_in, MatrixXd &Q_in) {
-  x_ = x_in;
-  P_ = P_in;
-  F_ = F_in;
-  H_ = H_in;
-  R_laser_ = R_in;
-  Q_ = Q_in;
-  
-  tools = Tools();
-}
-
 void KalmanFilter::Predict() {
   MatrixXd Ft = F_.transpose();
   x_ = F_ * x_;
@@ -34,8 +20,13 @@ void KalmanFilter::Predict() {
 }
 
 void KalmanFilter::Update(const VectorXd &z) {
+  // standard linear kalman filter stuff
+
+  // compute measurement error (current measurement - prediction)
   VectorXd y = z - H_ * x_;
+
   MatrixXd Ht = H_.transpose();
+
   MatrixXd S = H_ * P_ * Ht + R_laser_;
   MatrixXd Si = S.inverse();
   MatrixXd K =  P_ * Ht * Si;
@@ -46,15 +37,14 @@ void KalmanFilter::Update(const VectorXd &z) {
 }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
-  // compute a Jacobian matrix for the current state vector
-  MatrixXd Hj = tools.CalculateJacobian(x_);
-
   // calculate a predicted measurement
   VectorXd h_x = tools.CalculatePolar(x_);
 
-  // compute error
+  // compute measurement error (current measurement - prediction)
   VectorXd y = z - h_x;
+
   // normalize rho error if it is outside the -PI < rho < PI boundaries
+  // a single if statememnt would've been enough but this feels safer in case -3 * PI < y[1] < 3 * PI
   while (y[1] < -PI) {
     y[1] += 2 * PI;
   }
@@ -62,8 +52,12 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
     y[1] -= 2 * PI;
   }
 
+  // compute Jacobian matrix for the current state vector
+  MatrixXd Hj = tools.CalculateJacobian(x_);
+  // and its transposition
   MatrixXd Hjt = Hj.transpose();
 
+  // kalman filter stuff
   MatrixXd S = Hj * P_ * Hjt + R_radar_;
   MatrixXd Si = S.inverse();
   MatrixXd K =  P_ * Hjt * Si;

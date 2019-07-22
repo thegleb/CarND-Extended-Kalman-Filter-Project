@@ -1,9 +1,8 @@
 #ifndef KALMAN_FILTER_H_
 #define KALMAN_FILTER_H_
 
-#define _USE_MATH_DEFINES
+#define PI 3.14159265358979
 
-#include <cmath>
 #include "Eigen/Dense"
 #include "tools.h"
 
