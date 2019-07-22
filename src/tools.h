@@ -26,9 +26,12 @@ class Tools {
   /**
    * A helper method to calculate Jacobians.
    */
-  Eigen::MatrixXd CalculateJacobian(const Eigen::VectorXd& x_state);
+  static Eigen::MatrixXd CalculateJacobian(const Eigen::VectorXd& x_state);
 
-  Eigen::VectorXd CalculatePolar(const Eigen::VectorXd &x);
+  /**
+   * Cartesian state vector -> polar state vector conversion
+   */
+  static Eigen::VectorXd CalculatePolar(const Eigen::VectorXd &x);
 
 };
 

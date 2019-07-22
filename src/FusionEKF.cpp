@@ -61,6 +61,7 @@ FusionEKF::FusionEKF() {
   // process noise covariance
   ekf_.Q_ = MatrixXd(4, 4);
 
+  // identity matrix for reuse
   ekf_.I_ = MatrixXd::Identity(4, 4);
 }
 

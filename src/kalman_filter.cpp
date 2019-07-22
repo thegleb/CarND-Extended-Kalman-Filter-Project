@@ -38,7 +38,7 @@ void KalmanFilter::Update(const VectorXd &z) {
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
   // calculate a predicted measurement
-  VectorXd h_x = tools.CalculatePolar(x_);
+  VectorXd h_x = Tools::CalculatePolar(x_);
 
   // compute measurement error (current measurement - prediction)
   VectorXd y = z - h_x;
@@ -53,7 +53,7 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   }
 
   // compute Jacobian matrix for the current state vector
-  MatrixXd Hj = tools.CalculateJacobian(x_);
+  MatrixXd Hj = Tools::CalculateJacobian(x_);
   // and its transposition
   MatrixXd Hjt = Hj.transpose();
 

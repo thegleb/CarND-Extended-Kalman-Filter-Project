@@ -72,8 +72,6 @@ class KalmanFilter {
 
   Eigen::VectorXd u_;
   Eigen::VectorXd w_;
-
-  Tools tools;
 };
 
 #endif // KALMAN_FILTER_H_
