@@ -49,10 +49,11 @@ FusionEKF::FusionEKF() {
   
   // the initial transition matrix F_
   ekf_.F_ = MatrixXd(4, 4);
-  ekf_.F_ << 1, 0, 1, 0,
-  0, 1, 0, 1,
-  0, 0, 1, 0,
-  0, 0, 0, 1;
+  ekf_.F_ <<
+    1, 0, 1, 0,
+    0, 1, 0, 1,
+    0, 0, 1, 0,
+    0, 0, 0, 1;
   
   // acceleration noise components
   noise_ax = 9;
@@ -75,27 +76,26 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    * Initialization
    */
   if (!is_initialized_) {
-    // first measurement
+    // first measurement; fallback to 0, 0
     float px = 0;
     float py = 0;
-    float vx = 0;
-    float vy = 0;
+
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
-      // convert radar to cartesian coordinates and initialize
+      // convert radar position to cartesian coordinates and initialize
       float ro = measurement_pack.raw_measurements_[0];
       float theta = measurement_pack.raw_measurements_[1];
       px = ro * cos(theta);
       py = ro * sin(theta);
-    }
-    else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
+    } else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
       // initialize using laser measurement
       px = measurement_pack.raw_measurements_[0];
       py = measurement_pack.raw_measurements_[1];
-      vx = 0;
-      vy = 0;
     }
 
-    ekf_.x_ << px, py, vx, vy;
+    // not enough info to initialize velocity, so we initialize just the px/py
+    ekf_.x_ << px, py, 0, 0;
+
+    // cache timestamp so we can get the delta t at the next tick
     previous_timestamp_ = measurement_pack.timestamp_;
 
     // done initializing, no need to predict or update
@@ -103,7 +103,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     return;
   }
 
-  // divide to convert to seconds
+  // divide by 10000000 to convert to seconds
   float dt = (measurement_pack.timestamp_ - previous_timestamp_) / 1000000.0;
   float dt_2 = dt * dt;
   float dt_3 = dt_2 * dt;
@@ -129,7 +129,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
     // extended kalman filter update for radar
     ekf_.UpdateEKF(measurement_pack.raw_measurements_);
-  } else {
+  } else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
     // regular kalman filter for laser
     ekf_.Update(measurement_pack.raw_measurements_);
   }

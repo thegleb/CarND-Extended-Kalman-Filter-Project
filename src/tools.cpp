@@ -76,6 +76,7 @@ VectorXd Tools::CalculatePolar(const VectorXd &x) {
   float vy = x[3];
   float px_2_py_2 = pow(px, 2) + pow(py, 2);
 
+  // transform cartesian coordinates to range, rho, and rho_dot
   float range = sqrt(px_2_py_2);
   float rho = atan2(py, px);
   float rho_dot = (px * vx + py * vy) / sqrt(px_2_py_2);
