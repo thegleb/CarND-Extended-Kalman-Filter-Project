@@ -23,3 +23,4 @@ xcuserdata/
 CarND-Extended-Kalman-Filter-Project.xcodeproj
 ide_profiles/xcode/Debug/
 ide_profiles/xcode/ExtendedKF.build/
+cmake-build-debug/
